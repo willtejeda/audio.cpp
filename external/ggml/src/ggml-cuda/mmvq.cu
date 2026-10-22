@@ -375,10 +375,13 @@ static constexpr __host__ __device__ int calc_rows_per_block(int ncols_dst, int 
     if (table_id == MMVQ_PARAMETERS_GENERIC || table_id == MMVQ_PARAMETERS_GCN) {
         switch (ncols_dst) {
             case 1:
-                return small_k ? nwarps : 1;
+                // several rows per block share the q8_1 activation loads; measured on GP100 (sm_60) as the
+                // limit for MMVQ (shinbunbun/llama-cpp-p100-patches 02: 1 -> 4 rows, +23% decode)
+                return small_k ? nwarps : (table_id == MMVQ_PARAMETERS_GENERIC ? 4 : 1);
             case 2:
             case 3:
             case 4:
+                return table_id == MMVQ_PARAMETERS_GENERIC ? 4 : 2;
             case 5:
             case 6:
             case 7:
