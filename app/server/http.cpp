@@ -821,6 +821,13 @@ void handle_client(SocketHandle client, IHttpHandler & handler, uint64_t max_req
         } else {
             send_all(socket.get(), serialize_response(response));
         }
+    } catch (const std::invalid_argument & ex) {
+        // A request the model cannot serve as given (e.g. a clone model without reference audio): the caller's to fix.
+        try {
+            send_all(socket.get(), serialize_response(error_response(400, ex.what(), "invalid_request_error")));
+        } catch (const std::exception & send_error) {
+            std::cerr << "audiocpp_server failed to send error response: " << send_error.what() << "\n";
+        }
     } catch (const std::exception & ex) {
         if (engine::debug::log_enabled()) {
             engine::debug::log_message(std::string("[SERVER_HTTP_DEBUG] http.error ") + ex.what());

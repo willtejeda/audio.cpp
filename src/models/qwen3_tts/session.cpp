@@ -515,7 +515,11 @@ runtime::TaskResult Qwen3TTSSession::synthesize(const runtime::TaskRequest & req
     }
     const Qwen3TTSRequest first_request = make_request(chunk_requests.front());
     if (!first_request.voice_clone.has_value()) {
-        throw std::runtime_error("Qwen3 base TTS requires voice clone reference audio");
+        // invalid_argument: the caller left out the reference (or named a voice the library does not have), so the
+        // server answers 400 instead of 500.
+        throw std::invalid_argument(
+            "Qwen3 base TTS needs voice clone reference audio: set \"voice\" to a name from GET /v1/audio/voices "
+            "or pass voice_ref (named speakers such as Ryan are a CustomVoice model, not this one)");
     }
     if (speech_encoder_ == nullptr || speaker_encoder_ == nullptr) {
         throw std::runtime_error("Qwen3 base TTS session is missing voice clone runtimes");
