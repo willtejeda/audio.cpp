@@ -41,7 +41,7 @@ std::string resolve_voice_id(const std::optional<runtime::VoiceCondition> &voice
         voice_id = alias->second;
     }
     if (assets.voices.find(voice_id) == assets.voices.end()) {
-        throw std::runtime_error("unknown Kitten voice id: " + voice_id);
+        throw std::invalid_argument("unknown Kitten voice id: " + voice_id + " (see GET /v1/audio/voices for this model's voices)");
     }
     return voice_id;
 }
@@ -429,7 +429,7 @@ KittenFrontendSessionState resolve_kitten_frontend_session_state(const std::opti
     state.language_code = resolve_language_code(transcript, voice, state.voice_id);
     const auto voice_it = assets.voices.find(state.voice_id);
     if (voice_it == assets.voices.end()) {
-        throw std::runtime_error("unknown Kitten voice id: " + state.voice_id);
+        throw std::invalid_argument("unknown Kitten voice id: " + state.voice_id + " (see GET /v1/audio/voices for this model's voices)");
     }
     state.voice_pack = &voice_it->second;
     state.speaking_rate = apply_speed_prior(resolve_speaking_rate(voice), state.voice_id, assets);

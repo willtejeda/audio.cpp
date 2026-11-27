@@ -72,7 +72,7 @@ std::string resolve_voice_id(
         voice_id = *voice->speaker->cached_voice_id;
     }
     if (assets.voices.find(voice_id) == assets.voices.end()) {
-        throw std::runtime_error("unknown Kokoro voice id: " + voice_id);
+        throw std::invalid_argument("unknown Kokoro voice id: " + voice_id + " (see GET /v1/audio/voices for this model's voices)");
     }
     const std::string language_code = voice_language_code(voice_id);
     (void) resolve_language_code_alias(language_code);
@@ -241,7 +241,7 @@ KokoroFrontendSessionState resolve_kokoro_frontend_session_state(
     state.language_code = resolve_language_code(transcript, voice, state.voice_id);
     const auto voice_it = assets.voices.find(state.voice_id);
     if (voice_it == assets.voices.end()) {
-        throw std::runtime_error("unknown Kokoro voice id: " + state.voice_id);
+        throw std::invalid_argument("unknown Kokoro voice id: " + state.voice_id + " (see GET /v1/audio/voices for this model's voices)");
     }
     state.voice_pack = &voice_it->second;
     state.speaking_rate = resolve_speaking_rate(voice);

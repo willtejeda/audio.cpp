@@ -69,7 +69,7 @@ const RvcVoiceModel & select_packaged_voice(const RvcAssets & assets, const runt
     std::string voice_id = runtime::find_option(request.options, {"voice_id"}).value_or("default");
     const auto voice = assets.voices.find(voice_id);
     if (voice == assets.voices.end()) {
-        throw std::runtime_error("unknown RVC voice id: " + voice_id);
+        throw std::invalid_argument("unknown RVC voice id: " + voice_id + " (see GET /v1/audio/voices for this model's voices)");
     }
     return voice->second;
 }
